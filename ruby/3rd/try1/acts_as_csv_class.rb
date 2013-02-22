@@ -1,13 +1,24 @@
 class ActsAsCsv
 
   class CsvRow
+
+    include Enumerable
+
     def method_missing(name, *args)
-      @cols[@index_of[name.to_s]]
+      @header_map[name.to_s]
     end
 
-    def initialize(index_of, cols)
-      @index_of = index_of
+    def initialize(cols, header_map = {})
       @cols = cols
+      @header_map = header_map
+    end
+
+    def each
+      @cols.each{|col| yield col}
+    end
+
+    def inspect
+      @cols.inspect
     end
   end
 
@@ -23,11 +34,13 @@ class ActsAsCsv
     file = File.new(self.class.to_s.downcase + '.txt')
     @headers = file.gets.chomp.split(/\s*,\s*/)
 
-    index_of = {}
-    @headers.each_with_index{|title, index| index_of[title] = index}
-
     file.each do |row|
-      @csv_contents << CsvRow.new(index_of, row.chomp.split(/\s*,\s*/))
+      cols = row.chomp.split(/\s*,\s*/)
+      header_map = {}
+      @headers.each_with_index do |title, index|
+        header_map[title] = cols[index] if index < cols.count
+      end
+      @csv_contents << CsvRow.new(cols, header_map)
     end
   end
 
@@ -46,5 +59,6 @@ puts m.headers.inspect
 puts m.csv_contents.inspect
 
 m.each do |row|
+  row.each{|col| p col}
   puts row.bb
 end
