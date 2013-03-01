@@ -11,12 +11,13 @@ Matrix := List clone do (
 		r )
 	write := method(path, f := File with(path) openForUpdating;
 		self foreach(row, 
-			row foreach(col, f write(" #{col}" interpolate))
+			row foreach(col, f write(" #{col serialized}" interpolate))
 			 f write("\n")))
-	read := method(path, data := File with(path) openForReading contents;
-		self empty
-		data println)
-		
+	read := method(path, f := File with(path) openForReading
+		while(line := f readLine,
+			list := List clone
+			line strip split(" ") foreach(i, v, list append(doString(v)))
+			self append(list)))
 )
 
 
@@ -42,3 +43,7 @@ for(i, 0, new_matrix size -1, new_matrix at(i) println)
 
 matrix write("write.txt")
 
+read_matrix := Matrix clone 
+
+read_matrix read("read.txt")
+for(i, 0, read_matrix size -1, read_matrix at(i) println) 

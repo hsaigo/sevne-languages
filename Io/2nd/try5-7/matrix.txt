@@ -1,3 +1,0 @@
- aaa nil nil nil
- bbb nil bbb nil
- ccc nil nil ccc
