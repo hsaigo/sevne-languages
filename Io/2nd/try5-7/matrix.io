@@ -9,15 +9,19 @@ Matrix := List clone do (
 		for(x, 0, self size - 1,
 			for(y, 0, self at(0) size - 1, r set(y, x, self get(x, y))))
 		r )
-	write := method(path, f := File with(path) openForUpdating;
+	write := method(path, 
+		f := File with(path) openForUpdating;
 		self foreach(row, 
 			row foreach(col, f write(" #{col serialized}" interpolate))
-			 f write("\n")))
-	read := method(path, f := File with(path) openForReading
+			 f write("\n"))
+		f close)
+	read := method(path,
+		f := File with(path) openForReading
 		while(line := f readLine,
 			list := List clone
 			line strip split(" ") foreach(i, v, list append(doString(v)))
-			self append(list)))
+			self append(list))
+		f close)
 )
 
 
